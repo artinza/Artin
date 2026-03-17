@@ -13,10 +13,25 @@
 html,body{height:100%;}
 body{background:var(--void);color:var(--bone);font-family:var(--display);cursor:none;display:flex;align-items:center;justify-content:center;overflow:hidden;}
 body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;}
-#cursor{position:fixed;top:0;left:0;width:20px;height:20px;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
-#cursor svg{width:100%;height:100%;}
-#cursor-ring{position:fixed;top:0;left:0;width:40px;height:40px;border:0.5px solid rgba(224,90,26,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s;}
-body.hovering #cursor-ring{width:60px;height:60px;}
+#cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 20px; height: 20px;
+    pointer-events: none;
+    z-index: 99999;
+  }
+  #cursor svg { width: 100%; height: 100%; }
+  #cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 40px; height: 40px;
+    border: 0.5px solid rgba(224,90,26,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transition: width .3s ease, height .3s ease, opacity .3s ease;
+  }
+body.hovering #cursor-ring{position:fixed;width:40px;height:40px;border:0.5px solid rgba(224,90,26,0.5);border-radius:50%;pointer-events:none;z-index:99998;will-change:transform;transition:width .3s,height .3s;}
 .container{position:relative;z-index:1;text-align:center;padding:40px;}
 .big-num{font-size:clamp(120px,20vw,220px);font-weight:700;letter-spacing:-0.05em;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(224,90,26,0.25);display:block;animation:fadeIn 1s ease forwards;}
 .label{font-family:var(--mono);font-size:10px;letter-spacing:0.3em;color:var(--burn);text-transform:uppercase;margin:16px 0 32px;opacity:0;animation:fadeIn .8s ease .3s forwards;}
@@ -26,11 +41,13 @@ body.hovering #cursor-ring{width:60px;height:60px;}
 .home-link:hover{border-color:var(--burn);color:var(--burn);}
 .home-link::after{content:'→';color:var(--burn);}
 @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-</style>
+  .page-wrap { min-height: 100vh; }
+  </style>
 </head>
 <body>
 <div id="cursor"><svg viewBox="0 0 20 20" fill="none"><line x1="10" y1="0" x2="10" y2="7" stroke="#E05A1A" stroke-width="0.8"/><line x1="10" y1="13" x2="10" y2="20" stroke="#E05A1A" stroke-width="0.8"/><line x1="0" y1="10" x2="7" y2="10" stroke="#E05A1A" stroke-width="0.8"/><line x1="13" y1="10" x2="20" y2="10" stroke="#E05A1A" stroke-width="0.8"/><circle cx="10" cy="10" r="2" stroke="#E05A1A" stroke-width="0.8"/></svg></div>
 <div id="cursor-ring"></div>
+<div class="page-wrap">
 <div class="container">
   <span class="big-num">404</span>
   <div class="label">Page not found</div>
@@ -50,32 +67,32 @@ let mx=-100,my=-100,rx=-100,ry=-100;
     requestAnimationFrame(animRing);
   }
   animRing();
-  document.addEventListener('mouseleave',function(){ cursor.style.opacity='0'; ring.style.opacity='0'; });
-  document.addEventListener('mouseenter',function(){ cursor.style.opacity='1'; ring.style.opacity='1'; });
 })();
 
 document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
 
 document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));});
 
-// ── CURSOR (fixed) ──
+
+
+// ── CURSOR ──
 (function(){
   var cur = document.getElementById('cursor');
   var ring = document.getElementById('cursor-ring');
   if (!cur || !ring) return;
-  // Start off-screen
   var mx = -100, my = -100, rx = -100, ry = -100;
   document.addEventListener('mousemove', function(e) {
     mx = e.clientX;
     my = e.clientY;
-    // Move crosshair instantly via transform — immune to scroll & page animations
-    cur.style.transform = 'translate(' + (mx - 10) + 'px, ' + (my - 10) + 'px)';
+    // clientX/Y is viewport-relative — always correct for position:fixed
+    cur.style.left = (mx - 10) + 'px';
+    cur.style.top  = (my - 10) + 'px';
   }, { passive: true });
-  // Ring follows with lerp
   function lerpRing() {
     rx += (mx - rx) * 0.13;
     ry += (my - ry) * 0.13;
-    ring.style.transform = 'translate(' + (rx - 20) + 'px, ' + (ry - 20) + 'px)';
+    ring.style.left = (rx - 20) + 'px';
+    ring.style.top  = (ry - 20) + 'px';
     requestAnimationFrame(lerpRing);
   }
   lerpRing();
@@ -87,5 +104,6 @@ document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=
   });
 })();
 </script>
+</div><!-- /.page-wrap -->
 </body>
 </html>

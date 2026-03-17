@@ -64,7 +64,6 @@ body::after {
     width: 20px; height: 20px;
     pointer-events: none;
     z-index: 99999;
-    will-change: transform;
   }
   #cursor svg { width: 100%; height: 100%; }
   #cursor-ring {
@@ -75,7 +74,6 @@ body::after {
     border-radius: 50%;
     pointer-events: none;
     z-index: 99998;
-    will-change: transform;
     transition: width .3s ease, height .3s ease, opacity .3s ease;
   }
 body.hovering #cursor-ring { width:60px; height:60px; }
@@ -362,19 +360,20 @@ nav::after { content:''; position:absolute; bottom:0; left:48px; right:48px; hei
 
   /* ── PAGE TRANSITIONS ── */
   .page-transition-out {
-    animation: pageOut 0.35s cubic-bezier(0.4,0,1,1) forwards;
+    animation: pageOut 0.3s ease forwards;
   }
   @keyframes pageOut {
-    from { opacity:1; transform:translateX(0); }
-    to   { opacity:0; transform:translateX(-18px); }
+    from { opacity:1; }
+    to   { opacity:0; }
   }
   @keyframes pageIn {
-    from { opacity:0; transform:translateX(18px); }
-    to   { opacity:1; transform:translateX(0); }
+    from { opacity:0; }
+    to   { opacity:1; }
   }
-  body { animation: pageIn 0.45s cubic-bezier(0,0,0.3,1) both; }
+  .page-wrap { animation: pageIn 0.35s ease both; }
 
-</style>
+  .page-wrap { min-height: 100vh; }
+  </style>
 </head>
 <body>
 
@@ -390,6 +389,7 @@ nav::after { content:''; position:absolute; bottom:0; left:48px; right:48px; hei
 </div>
 <div id="cursor-ring"></div>
 
+<div class="page-wrap">
 <nav>
   <a href="index.html" class="nav-logo">A<span>.</span>Z — <span>001</span></a>
   <ul class="nav-links">
@@ -448,8 +448,8 @@ nav::after { content:''; position:absolute; bottom:0; left:48px; right:48px; hei
     <!-- Email -->
     <div class="email-block">
       <div class="email-label">Direct Line</div>
-      <a href="mailto:artin.zainalpour@gmail.com" class="email-address">
-        artin.zainalpour@gmail.com
+      <a href="/cdn-cgi/l/email-protection#a8c9dadcc1c686d2c9c1c6c9c4d8c7dddae8cfc5c9c1c486cbc7c5" class="email-address">
+        <span class="__cf_email__" data-cfemail="422330362b2c6c38232b2c232e322d373002252f232b2e6c212d2f">[email&#160;protected]</span>
         <span class="email-arrow">→</span>
       </a>
       <br>
@@ -506,7 +506,7 @@ nav::after { content:''; position:absolute; bottom:0; left:48px; right:48px; hei
 <!-- Bottom bar -->
 <div class="bottom-bar">
   <div class="bottom-note">
-    Artin Zainalpour · <span>artin.zainalpour@gmail.com</span> · GTA, Canada
+    Artin Zainalpour · <span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a9c8dbddc0c787d3c8c0c7c8c5d9c6dcdbe9cec4c8c0c587cac6c4">[email&#160;protected]</a></span> · GTA, Canada
   </div>
   <div class="status-live">
     <span class="status-dot"></span>
@@ -514,7 +514,39 @@ nav::after { content:''; position:absolute; bottom:0; left:48px; right:48px; hei
   </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+
+
+
+// ── CURSOR ──
+(function(){
+  var cur = document.getElementById('cursor');
+  var ring = document.getElementById('cursor-ring');
+  if (!cur || !ring) return;
+  var mx = -100, my = -100, rx = -100, ry = -100;
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX;
+    my = e.clientY;
+    // clientX/Y is viewport-relative — always correct for position:fixed
+    cur.style.left = (mx - 10) + 'px';
+    cur.style.top  = (my - 10) + 'px';
+  }, { passive: true });
+  function lerpRing() {
+    rx += (mx - rx) * 0.13;
+    ry += (my - ry) * 0.13;
+    ring.style.left = (rx - 20) + 'px';
+    ring.style.top  = (ry - 20) + 'px';
+    requestAnimationFrame(lerpRing);
+  }
+  lerpRing();
+  document.addEventListener('mouseleave', function() {
+    cur.style.opacity = '0'; ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', function() {
+    cur.style.opacity = '1'; ring.style.opacity = '1';
+  });
+})();
+</script><script>
 
 
   function animRing(){
@@ -522,17 +554,4 @@ nav::after { content:''; position:absolute; bottom:0; left:48px; right:48px; hei
     ry+=(my-ry)*0.13;
     ring.style.left=rx+'px';
     ring.style.top=ry+'px';
-    requestAnimationFrame(animRing);
-  }
-  animRing();
-  // Hide custom cursor when mouse leaves window
-  document.addEventListener('mouseleave',function(){
-    cursor.style.opacity='0'; ring.style.opacity='0';
-  });
-  document.addEventListener('mouseenter',function(){
-    cursor.style.opacity='1'; ring.style.opacity='1';
-  });
-})();
-
-document.querySelectorAll('a,button,.open-item').forEach(el=>{
-  el.add
+    requestAnimationFr
