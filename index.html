@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artin Zainalpour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400;500&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --void: #080808;
+    --bone: #EDE8DF;
+    --bone-dim: #A09890;
+    --titanium: #B8A898;
+    --burn: #E05A1A;
+    --sky: #1A3A5C;
+    --grid: rgba(255,255,255,0.032);
+    --mono: 'JetBrains Mono', monospace;
+    --display: 'Barlow Condensed', sans-serif;
+    --body: 'Barlow', sans-serif;
+  }
+
+  html { scroll-behavior: smooth; cursor:none; }
+
+  body {
+    background: var(--void);
+    color: var(--bone);
+    font-family: var(--body);
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+#cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 20px; height: 20px;
+    pointer-events: none;
+    z-index: 99999;
+    will-change: transform;
+  }
+  #cursor svg { width: 100%; height: 100%; }
+  #cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 40px; height: 40px;
+    border: 0.5px solid rgba(224,90,26,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    will-change: transform;
+    transition: width .3s ease, height .3s ease, opacity .3s ease;
+  }
+  body.hovering #cursor-ring { width: 60px; height: 60px; opacity: 0.8; }
+
+  /* BLUEPRINT GRID */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 28px 48px;
+    opacity: 0;
+    animation: fadeIn 1s ease 0.2s forwards;
+  }
+  nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 48px; right: 48px;
+    height: 0.5px;
+    background: rgba(255,255,255,0.08);
+  }
+  .nav-logo {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--bone-dim);
+    text-transform: uppercase;
+  }
+  .nav-logo span { color: var(--burn); }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--bone-dim);
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0;
+    width: 0; height: 0.5px;
+    background: var(--burn);
+    transition: width 0.3s ease;
+  }
+  .nav-links a:hover { color: var(--bone); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 48px;
+    z-index: 1;
+  }
+
+  .hero-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--burn);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: drawIn 0.8s ease 0.6s forwards;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 32px; height: 0.5px;
+    background: var(--burn);
+    animation: extendLine 0.8s ease 0.6s both;
+  }
+
+  .hero-name {
+    font-family: var(--display);
+    font-size: clamp(72px, 12vw, 160px);
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    overflow: hidden;
+  }
+  .hero-name .line {
+    display: block;
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  .hero-name .line:nth-child(1) { animation: slideUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.7s forwards; }
+  .hero-name .line:nth-child(2) {
+    animation: slideUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.85s forwards;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(237,232,223,0.3);
+  }
+
+  .hero-tagline {
+    margin-top: 32px;
+    max-width: 420px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--bone-dim);
+    letter-spacing: 0.04em;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.3s forwards;
+  }
+
+  /* dimension lines */
+  .dim-line {
+    position: absolute;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.6s forwards;
+  }
+  .dim-h {
+    top: 50%;
+    right: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .dim-h .dim-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--titanium);
+    letter-spacing: 0.15em;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+  }
+  .dim-h .dim-tick {
+    width: 0.5px;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--titanium), transparent);
+  }
+
+  /* annotation corners */
+  .corner-annotation {
+    position: absolute;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: rgba(184,168,152,0.4);
+    letter-spacing: 0.1em;
+    opacity: 0;
+    animation: fadeIn 1.2s ease 1.8s forwards;
+  }
+  .corner-annotation.tl { top: 90px; left: 48px; }
+  .corner-annotation.tr { top: 90px; right: 48px; text-align: right; }
+  .corner-annotation.bl { bottom: 48px; left: 48px; }
+  .corner-annotation.br { bottom: 48px; right: 48px; text-align: right; }
+
+  /* corner bracket tl */
+  .corner-annotation.tl::before {
+    content: '';
+    position: absolute;
+    top: -8px; left: 0;
+    width: 16px; height: 16px;
+    border-top: 0.5px solid rgba(184,168,152,0.3);
+    border-left: 0.5px solid rgba(184,168,152,0.3);
+  }
+
+  /* STATS */
+  .stats {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 0;
+    padding: 64px 48px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+  }
+  .stat {
+    flex: 1;
+    padding: 0 32px 0 0;
+    border-right: 0.5px solid rgba(255,255,255,0.06);
+    opacity: 0;
+  }
+  .stat:first-child { padding-left: 0; }
+  .stat:last-child { border-right: none; padding-right: 0; }
+  .stat:nth-child(1) { animation: fadeIn 0.8s ease 1.4s forwards; }
+  .stat:nth-child(2) { animation: fadeIn 0.8s ease 1.55s forwards; }
+  .stat:nth-child(3) { animation: fadeIn 0.8s ease 1.7s forwards; }
+
+  .stat-number {
+    font-family: var(--mono);
+    font-size: 48px;
+    font-weight: 300;
+    color: var(--bone);
+    line-height: 1;
+    margin-bottom: 10px;
+  }
+  .stat-number span { color: var(--burn); }
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--bone-dim);
+    text-transform: uppercase;
+  }
+
+  /* STACK */
+  .stack-section {
+    position: relative;
+    z-index: 1;
+    padding: 64px 48px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+  }
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--burn);
+    text-transform: uppercase;
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px; height: 0.5px;
+    background: var(--burn);
+  }
+  .stack-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .stack-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--bone-dim);
+    padding: 7px 14px;
+    border: 0.5px solid rgba(255,255,255,0.1);
+    text-transform: uppercase;
+    transition: border-color 0.3s, color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .stack-tag::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--burn);
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    z-index: 0;
+  }
+  .stack-tag:hover { color: var(--void); border-color: var(--burn); }
+  .stack-tag:hover::before { transform: scaleX(1); opacity: 1; }
+  .stack-tag span { position: relative; z-index: 1; }
+  .stack-tag.featured { border-color: rgba(224,90,26,0.4); color: var(--bone); }
+
+  /* QUOTES SECTION */
+  .quotes-section {
+    position: relative;
+    z-index: 1;
+    padding: 80px 48px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+    overflow: hidden;
+  }
+
+  .quote-stage {
+    position: relative;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .quote-item {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    pointer-events: none;
+  }
+  .quote-item.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+  .quote-item.exit {
+    opacity: 0;
+    transform: translateY(-12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .quote-mark {
+    font-family: var(--display);
+    font-size: 80px;
+    font-weight: 700;
+    color: var(--burn);
+    opacity: 0.2;
+    line-height: 0.6;
+    margin-bottom: 12px;
+    display: block;
+    letter-spacing: -0.05em;
+  }
+  .quote-text {
+    font-family: var(--display);
+    font-size: clamp(22px, 3.5vw, 38px);
+    font-weight: 300;
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    color: var(--bone);
+    max-width: 820px;
+  }
+  .quote-text em {
+    font-style: normal;
+    color: var(--burn);
+  }
+  .quote-translation {
+    margin-top: 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--bone-dim);
+    letter-spacing: 0.1em;
+    font-style: italic;
+  }
+  .quote-attr {
+    margin-top: 20px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--titanium);
+    text-transform: uppercase;
+  }
+
+  .quote-controls {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-top: 48px;
+  }
+  .quote-btn {
+    background: none;
+    border: 0.5px solid rgba(255,255,255,0.15);
+    color: var(--bone-dim);
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: none;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .quote-btn:hover { border-color: var(--burn); color: var(--burn); }
+  .quote-btn svg { width: 14px; height: 14px; }
+
+  .quote-dots {
+    display: flex;
+    gap: 8px;
+  }
+  .quote-dot {
+    width: 16px; height: 1px;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.3s, width 0.3s;
+    cursor: none;
+  }
+  .quote-dot.active { background: var(--burn); width: 28px; }
+
+  .quote-progress {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--bone-dim);
+    letter-spacing: 0.15em;
+    margin-left: auto;
+  }
+
+  /* LOCATION / FOOTER STRIP */
+  .footer-strip {
+    position: relative;
+    z-index: 1;
+    padding: 28px 48px;
+    border-top: 0.5px solid rgba(255,255,255,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .location {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--bone-dim);
+    text-transform: uppercase;
+  }
+  .location span { color: var(--burn); }
+  .cta-link {
+    font-family: var(--display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--bone);
+    text-decoration: none;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.2s;
+  }
+  .cta-link::after {
+    content: '→';
+    color: var(--burn);
+    transition: transform 0.3s;
+  }
+  .cta-link:hover { color: var(--burn); }
+  .cta-link:hover::after { transform: translateX(5px); }
+
+  /* KEYFRAMES */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(100%); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes drawIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes extendLine { from { width: 0; } to { width: 32px; } }
+  @keyframes countUp { from { opacity: 0; } to { opacity: 1; } }
+
+  /* Progress bar at top */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 1px;
+    background: var(--burn);
+    width: 0%;
+    z-index: 200;
+    transition: width 0.1s linear;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 2px; }
+  ::-webkit-scrollbar-track { background: var(--void); }
+  ::-webkit-scrollbar-thumb { background: var(--burn); }
+
+  @media (max-width: 768px) {
+    nav, .hero, .stats, .stack-section, .quotes-section, .footer-strip { padding-left: 24px; padding-right: 24px; }
+    .stats { flex-direction: column; gap: 32px; }
+    .stat { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.06); padding: 0 0 24px 0; }
+    .stat:last-child { border-bottom: none; padding-bottom: 0; }
+    nav::after { left: 24px; right: 24px; }
+  }
+
+  /* ── PAGE TRANSITIONS ── */
+  .page-transition-out {
+    animation: pageOut 0.35s cubic-bezier(0.4,0,1,1) forwards;
+  }
+  @keyframes pageOut {
+    from { opacity:1; transform:translateX(0); }
+    to   { opacity:0; transform:translateX(-18px); }
+  }
+  @keyframes pageIn {
+    from { opacity:0; transform:translateX(18px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  body { animation: pageIn 0.45s cubic-bezier(0,0,0.3,1) both; }
+
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- Custom cursor -->
+<div id="cursor">
+  <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="10" y1="0" x2="10" y2="7" stroke="#E05A1A" stroke-width="0.8"/>
+    <line x1="10" y1="13" x2="10" y2="20" stroke="#E05A1A" stroke-width="0.8"/>
+    <line x1="0" y1="10" x2="7" y2="10" stroke="#E05A1A" stroke-width="0.8"/>
+    <line x1="13" y1="10" x2="20" y2="10" stroke="#E05A1A" stroke-width="0.8"/>
+    <circle cx="10" cy="10" r="2" stroke="#E05A1A" stroke-width="0.8"/>
+  </svg>
+</div>
+<div id="cursor-ring"></div>
+
+<!-- Nav -->
+<nav>
+  <a href="index.html" class="nav-logo">A<span>.</span>Z — <span>001</span></a>
+  <ul class="nav-links">
+    <li><a href="work.html">Work</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="journey.html">Journey</a></li>
+    <li><a href="connect.html">Connect</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-label">GTA, Canada — Engineer / Builder / Explorer</div>
+  <h1 class="hero-name">
+    <span class="line">Artin</span>
+    <span class="line">Zainalpour</span>
+  </h1>
+  <p class="hero-tagline">Pushing the limits of what's possible — optimizing beyond convention through precision, innovation, and a relentless curiosity about how things truly work.</p>
+
+  <!-- Corner annotations -->
+  <div class="corner-annotation tl">REV 01 · 2025</div>
+  <div class="corner-annotation tr">SCALE 1:1<br>GTA / CANADA</div>
+  <div class="corner-annotation bl">FUSION 360 · PYTHON · ESP32<br>RASPBERRY PI · CFD · ML</div>
+  <div class="corner-annotation br">DUTCH · ENGLISH · FARSI<br>AZARI · DEUTSCH A2</div>
+
+  <!-- Dimension tick right side -->
+  <div class="dim-line dim-h">
+    <div class="dim-label">PROFILE HEIGHT</div>
+    <div class="dim-tick"></div>
+  </div>
+</section>
+
+<!-- Stats -->
+<section class="stats">
+  <div class="stat">
+    <div class="stat-number"><span id="count1">0</span>+</div>
+    <div class="stat-label">Projects Built</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number"><span id="count2">0</span></div>
+    <div class="stat-label">Clients Served · 3D Print Co.</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number"><span id="count3">0</span></div>
+    <div class="stat-label">Internship · Brickeye</div>
+  </div>
+</section>
+
+<!-- Stack -->
+<section class="stack-section">
+  <div class="section-label">Technical Stack</div>
+  <div class="stack-grid">
+    <div class="stack-tag featured"><span>Fusion 360 ★</span></div>
+    <div class="stack-tag featured"><span>Python ★</span></div>
+    <div class="stack-tag"><span>Raspberry Pi</span></div>
+    <div class="stack-tag"><span>ESP32</span></div>
+    <div class="stack-tag"><span>3D Printing</span></div>
+    <div class="stack-tag"><span>Motor Control</span></div>
+    <div class="stack-tag"><span>Matter Protocol</span></div>
+    <div class="stack-tag"><span>Smart Home Systems</span></div>
+    <div class="stack-tag"><span>KiCad · PCB</span></div>
+    <div class="stack-tag"><span>Autodesk CFD</span></div>
+    <div class="stack-tag"><span>Mechanical Design</span></div>
+    <div class="stack-tag"><span>Java</span></div>
+    <div class="stack-tag"><span>ML / AI</span></div>
+    <div class="stack-tag"><span>Fluid Dynamics</span></div>
+  </div>
+</section>
+
+<!-- Quotes -->
+<section class="quotes-section">
+  <div class="section-label">Principles &amp; Axioms</div>
+
+  <div class="quote-stage" id="quoteStage">
+
+    <div class="quote-item active" data-priority="1">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Imagination is more important than knowledge.</div>
+      <div class="quote-attr">— Albert Einstein</div>
+    </div>
+
+    <div class="quote-item" data-priority="1">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Ingenieurskunst verbindet Präzision mit Seele.</div>
+      <div class="quote-translation">Engineering art unites precision with soul.</div>
+    </div>
+
+    <div class="quote-item" data-priority="1">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Was einfach aussieht, ist oft am schwierigsten zu bauen.</div>
+      <div class="quote-translation">What looks simple is often the hardest to build.</div>
+    </div>
+
+    <div class="quote-item" data-priority="1">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">I do not think there is any thrill that can go through the human heart like that felt by the inventor as he sees some creation of the brain unfolding to success.</div>
+      <div class="quote-attr">— Nikola Tesla</div>
+    </div>
+
+    <div class="quote-item" data-priority="1">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Perfektion ist nicht ein Ziel, sondern eine Haltung.</div>
+      <div class="quote-translation">Perfection is not a goal, but an attitude.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Invention is the most important product of man's creative brain. The ultimate purpose is the complete mastery of mind over the material world.</div>
+      <div class="quote-attr">— Nikola Tesla</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">What one man calls God, another calls the laws of physics.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">The more precisely you know one thing, the less precisely you can know another.</div>
+      <div class="quote-attr">— Heisenberg Uncertainty Principle</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">If you know exactly where you're headed and your exact plan — you are living someone else's dream.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">You can't connect the dots looking forward. You can only connect them looking backwards.</div>
+      <div class="quote-attr">— Steve Jobs</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Cars and planes are works of art — the byproduct of a group of dedicated artists thinking, planning, exploring, and pushing limits in the realm of engineering.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">What we observe is not nature itself, but nature exposed to our method of questioning.</div>
+      <div class="quote-attr">— Werner Heisenberg</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">God does not play dice with the universe.</div>
+      <div class="quote-attr">— Albert Einstein</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Technik ist Kunst.</div>
+      <div class="quote-translation">Technology is art.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Form folgt Funktion.</div>
+      <div class="quote-translation">Form follows function.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Gott steckt im Detail.</div>
+      <div class="quote-translation">God is in the detail.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Eenvoud is de ultieme verfijning.</div>
+      <div class="quote-translation">Simplicity is the ultimate refinement.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Goed ontwerp lost problemen op zonder op te vallen.</div>
+      <div class="quote-translation">Good design solves problems without drawing attention to itself.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Reality is merely an illusion, albeit a very persistent one.</div>
+      <div class="quote-attr">— Albert Einstein</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">Light behaves as both particle and wave — depending on how you look at it.</div>
+    </div>
+
+    <div class="quote-item">
+      <span class="quote-mark">"</span>
+      <div class="quote-text">If you think you understand quantum mechanics, you don't understand quantum mechanics.</div>
+      <div class="quote-attr">— Richard Feynman</div>
+    </div>
+
+  </div>
+
+  <div class="quote-controls">
+    <button class="quote-btn" id="prevBtn" aria-label="Previous">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M9 2L4 7L9 12" stroke="currentColor" stroke-width="1"/></svg>
+    </button>
+    <button class="quote-btn" id="nextBtn" aria-label="Next">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M5 2L10 7L5 12" stroke="currentColor" stroke-width="1"/></svg>
+    </button>
+    <div class="quote-dots" id="quoteDots"></div>
+    <div class="quote-progress" id="quoteProgress">01 / 21</div>
+  </div>
+</section>
+
+<!-- Footer strip -->
+<div class="footer-strip">
+  <div class="location">Based in <span>Greater Toronto Area</span>, Canada</div>
+  <a href="work.html" class="cta-link">See the Work</a>
+</div>
+
+<script>
+
+
+  function animRing(){
+    rx+=(mx-rx)*0.13;
+    ry+=(my-ry)*0.13;
+    ring.style.left=rx+'px';
+    ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+  // Hide custom cursor when mouse leaves window
+  document.addEventListener('mouseleave',function(){
+    cursor.style.opacity='0'; ring.style.opacity='0';
+  });
+  document.addEventListener('mouseenter',function(){
+    cursor.style.opacity='1'; ring.style.opacity='1';
+  });
+})();
+
+
+document.querySelectorAll('a, button, .stack-tag, .quote-dot').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+});
+
+// Scroll progress
+window.addEventListener('scroll', () => {
+  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+// Counter animation
+function animateCount(id, target, duration, delay) {
+  setTimeout(() => {
+    const el = document.getElementById(id);
+    let start = 0;
+    const step = target / (duration / 16);
+    const timer = setInterval(() => {
+      start = Math.min(start + step, target);
+      el.textContent = Math.floor(start);
+      if (start >= target) clearInterval(timer);
+    }, 16);
+  }, delay);
+}
+animateCount('count1', 8, 1200, 1400);
+animateCount('count2', 4, 900, 1550);
+animateCount('count3', 1, 600, 1700);
+
+// Quotes system
+const items = Array.from(document.querySelectorAll('.quote-item'));
+const prioritized = items.filter(i => i.dataset.priority === '1');
+const rest = items.filter(i => i.dataset.priority !== '1');
+// Shuffle rest
+for (let i = rest.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [rest[i], rest[j]] = [rest[j], rest[i]];
+}
+const ordered = [...prioritized, ...rest];
+let current = 0;
+let autoTimer;
+
+const dotsContainer = document.getElementById('quoteDots');
+const progress = document.getElementById('quoteProgress');
+
+// build dots (max 8 visible)
+const dotCount = Math.min(ordered.length, 8);
+for (let i = 0; i < dotCount; i++) {
+  const d = document.createElement('div');
+  d.className = 'quote-dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => goTo(i));
+  dotsContainer.appendChild(d);
+}
+
+function updateDots(idx) {
+  const dots = dotsContainer.querySelectorAll('.quote-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx % dotCount));
+  progress.textContent = String(idx + 1).padStart(2, '0') + ' / ' + String(ordered.length).padStart(2, '0');
+}
+
+function goTo(idx) {
+  const prev = ordered[current];
+  prev.classList.add('exit');
+  setTimeout(() => { prev.classList.remove('active', 'exit'); }, 500);
+  current = (idx + ordered.length) % ordered.length;
+  ordered[current].classList.add('active');
+  updateDots(current);
+  resetTimer();
+}
+
+function resetTimer() {
+  clearInterval(autoTimer);
+  autoTimer = setInterval(() => goTo(current + 1), 5500);
+}
+
+document.getElementById('prevBtn').addEventListener('click', () => goTo(current - 1));
+document.getElementById('nextBtn').addEventListener('click', () => goTo(current + 1));
+
+// Keyboard arrows
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') goTo(current + 1);
+  if (e.key === 'ArrowLeft') goTo(current - 1);
+});
+
+resetTimer();
+
+// Page transition on link clicks
+document.querySelectorAll('a[href]').forEach(link => {
+  const href = link.getAttribute('href');
+  if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('http')) return;
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    document.body.classList.add('page-transition-out');
+    setTimeout(() => { window.location.href = href; }, 320);
+  });
+});
+
+
+// ── CURSOR (fixed) ──
+(function(){
+  var cur = document.getElementById('cursor');
+  var ring = document.getElementById('cursor-ring');
+  if (!cur || !ring) return;
+  // Start off-screen
+  var mx = -100, my = -100, rx = -100, ry = -100;
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX;
+    my = e.clientY;
+    // Move crosshair instantly via transform — immune to scroll & page animations
+    cur.style.transform = 'translate(' + (mx - 10) + 'px, ' + (my - 10) + 'px)';
+  }, { passive: true });
+  // Ring follows with lerp
+  function lerpRing() {
+    rx += (mx - rx) * 0.13;
+    ry += (my - ry) * 0.13;
+    ring.style.transform = 'translate(' + (rx - 20) + 'px, ' + (ry - 20) + 'px)';
+    requestAnimationFrame(lerpRing);
+  }
+  lerpRing();
+  document.addEventListener('mouseleave', function() {
+    cur.style.opacity = '0'; ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', function() {
+    cur.style.opacity = '1'; ring.style.opacity = '1';
+  });
+})();
+</script>
+</body>
+</html>

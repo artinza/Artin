@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>404 — Artin Zainalpour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{--void:#080808;--bone:#EDE8DF;--bone-dim:#A09890;--burn:#E05A1A;--grid:rgba(255,255,255,0.028);--mono:'JetBrains Mono',monospace;--display:'Barlow Condensed',sans-serif;}
+html,body{height:100%;}
+body{background:var(--void);color:var(--bone);font-family:var(--display);cursor:none;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;}
+#cursor{position:fixed;top:0;left:0;width:20px;height:20px;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);}
+#cursor svg{width:100%;height:100%;}
+#cursor-ring{position:fixed;top:0;left:0;width:40px;height:40px;border:0.5px solid rgba(224,90,26,0.5);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .3s,height .3s;}
+body.hovering #cursor-ring{width:60px;height:60px;}
+.container{position:relative;z-index:1;text-align:center;padding:40px;}
+.big-num{font-size:clamp(120px,20vw,220px);font-weight:700;letter-spacing:-0.05em;line-height:1;color:transparent;-webkit-text-stroke:1px rgba(224,90,26,0.25);display:block;animation:fadeIn 1s ease forwards;}
+.label{font-family:var(--mono);font-size:10px;letter-spacing:0.3em;color:var(--burn);text-transform:uppercase;margin:16px 0 32px;opacity:0;animation:fadeIn .8s ease .3s forwards;}
+.message{font-size:clamp(20px,3vw,32px);font-weight:300;color:var(--bone-dim);line-height:1.4;margin-bottom:40px;max-width:480px;opacity:0;animation:fadeIn .8s ease .5s forwards;}
+.message span{color:var(--bone);}
+.home-link{font-family:var(--mono);font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--bone);text-decoration:none;border:0.5px solid rgba(255,255,255,0.15);padding:12px 28px;display:inline-flex;align-items:center;gap:10px;transition:border-color .2s,color .2s;opacity:0;animation:fadeIn .8s ease .7s forwards;}
+.home-link:hover{border-color:var(--burn);color:var(--burn);}
+.home-link::after{content:'→';color:var(--burn);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div id="cursor"><svg viewBox="0 0 20 20" fill="none"><line x1="10" y1="0" x2="10" y2="7" stroke="#E05A1A" stroke-width="0.8"/><line x1="10" y1="13" x2="10" y2="20" stroke="#E05A1A" stroke-width="0.8"/><line x1="0" y1="10" x2="7" y2="10" stroke="#E05A1A" stroke-width="0.8"/><line x1="13" y1="10" x2="20" y2="10" stroke="#E05A1A" stroke-width="0.8"/><circle cx="10" cy="10" r="2" stroke="#E05A1A" stroke-width="0.8"/></svg></div>
+<div id="cursor-ring"></div>
+<div class="container">
+  <span class="big-num">404</span>
+  <div class="label">Page not found</div>
+  <p class="message">This component doesn't exist in the system.<br><span>But the engineer who built it does.</span></p>
+  <a href="index.html" class="home-link">Return to Base</a>
+</div>
+<script>
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+let mx=-100,my=-100,rx=-100,ry=-100;
+
+
+  function animRing(){
+    rx+=(mx-rx)*0.13;
+    ry+=(my-ry)*0.13;
+    ring.style.left=rx+'px';
+    ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+  document.addEventListener('mouseleave',function(){ cursor.style.opacity='0'; ring.style.opacity='0'; });
+  document.addEventListener('mouseenter',function(){ cursor.style.opacity='1'; ring.style.opacity='1'; });
+})();
+
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+
+document.querySelectorAll('a').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));});
+
+// ── CURSOR (fixed) ──
+(function(){
+  var cur = document.getElementById('cursor');
+  var ring = document.getElementById('cursor-ring');
+  if (!cur || !ring) return;
+  // Start off-screen
+  var mx = -100, my = -100, rx = -100, ry = -100;
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX;
+    my = e.clientY;
+    // Move crosshair instantly via transform — immune to scroll & page animations
+    cur.style.transform = 'translate(' + (mx - 10) + 'px, ' + (my - 10) + 'px)';
+  }, { passive: true });
+  // Ring follows with lerp
+  function lerpRing() {
+    rx += (mx - rx) * 0.13;
+    ry += (my - ry) * 0.13;
+    ring.style.transform = 'translate(' + (rx - 20) + 'px, ' + (ry - 20) + 'px)';
+    requestAnimationFrame(lerpRing);
+  }
+  lerpRing();
+  document.addEventListener('mouseleave', function() {
+    cur.style.opacity = '0'; ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', function() {
+    cur.style.opacity = '1'; ring.style.opacity = '1';
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connect — Artin Zainalpour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,300&family=Barlow:ital,wght@0,300;0,400;0,500;1,300&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --void: #080808;
+  --bone: #EDE8DF;
+  --bone-dim: #A09890;
+  --titanium: #B8A898;
+  --burn: #E05A1A;
+  --burn-dim: rgba(224,90,26,0.08);
+  --grid: rgba(255,255,255,0.028);
+  --border: rgba(255,255,255,0.07);
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Barlow Condensed', sans-serif;
+  --body: 'Barlow', sans-serif;
+}
+
+html, body { height: 100%; cursor:none; }
+
+body {
+  background: var(--void);
+  color: var(--bone);
+  font-family: var(--body);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+
+/* subtle radial glow behind the form area */
+body::after {
+  content: '';
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 700px; height: 700px;
+  background: radial-gradient(circle, rgba(224,90,26,0.04) 0%, transparent 70%);
+  pointer-events: none; z-index: 0;
+}
+
+/* CURSOR */
+#cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 20px; height: 20px;
+    pointer-events: none;
+    z-index: 99999;
+    will-change: transform;
+  }
+  #cursor svg { width: 100%; height: 100%; }
+  #cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 40px; height: 40px;
+    border: 0.5px solid rgba(224,90,26,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    will-change: transform;
+    transition: width .3s ease, height .3s ease, opacity .3s ease;
+  }
+body.hovering #cursor-ring { width:60px; height:60px; }
+#progress-bar { position:fixed; top:0; left:0; height:1px; background:var(--burn); width:0%; z-index:200; }
+
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:28px 48px; }
+nav::after { content:''; position:absolute; bottom:0; left:48px; right:48px; height:0.5px; background:rgba(255,255,255,0.08); }
+.nav-logo { font-family:var(--mono); font-size:11px; letter-spacing:0.2em; color:var(--bone-dim); text-decoration:none; text-transform:uppercase; }
+.nav-logo span { color:var(--burn); }
+.nav-links { display:flex; gap:36px; list-style:none; }
+.nav-links a { font-family:var(--mono); font-size:10px; letter-spacing:0.2em; color:var(--bone-dim); text-decoration:none; text-transform:uppercase; transition:color .2s; position:relative; }
+.nav-links a::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:0.5px; background:var(--burn); transition:width .3s; }
+.nav-links a:hover { color:var(--bone); }
+.nav-links a:hover::after { width:100%; }
+.nav-links a.active { color:var(--burn); }
+
+/* ── MAIN LAYOUT ── */
+.connect-wrap {
+  position: relative; z-index: 1;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: stretch;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  padding: 160px 64px 80px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-right: 0.5px solid var(--border);
+}
+
+.left-top {}
+
+.panel-eyebrow {
+  font-family: var(--mono); font-size:10px; letter-spacing:0.3em;
+  color: var(--burn); text-transform:uppercase;
+  display:flex; align-items:center; gap:12px;
+  margin-bottom: 24px;
+  opacity:0; animation: fadeUp .8s ease .15s forwards;
+}
+.panel-eyebrow::before { content:''; display:inline-block; width:24px; height:0.5px; background:var(--burn); }
+
+.panel-title {
+  font-family: var(--display);
+  font-size: clamp(56px, 7vw, 100px);
+  font-weight: 700; letter-spacing:-0.02em;
+  text-transform: uppercase; line-height: 0.9;
+  opacity:0; animation: fadeUp .9s cubic-bezier(.16,1,.3,1) .25s forwards;
+}
+.panel-title .ghost {
+  display: block;
+  -webkit-text-stroke: 1px rgba(237,232,223,0.18);
+  color: transparent;
+}
+
+.panel-statement {
+  margin-top: 40px;
+  max-width: 400px;
+  opacity:0; animation: fadeUp .8s ease .45s forwards;
+}
+.panel-statement p {
+  font-family: var(--display);
+  font-size: clamp(18px, 2.2vw, 26px);
+  font-weight: 300; line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+}
+.panel-statement p em { font-style:italic; color:var(--bone-dim); }
+.panel-statement p .accent { color:var(--burn); font-style:normal; }
+
+/* the reassurance line */
+.reassurance {
+  margin-top: 28px;
+  padding: 18px 20px;
+  border-left: 1.5px solid var(--burn);
+  background: var(--burn-dim);
+  opacity:0; animation: fadeUp .8s ease .6s forwards;
+}
+.reassurance p {
+  font-size: 13px; line-height: 1.75;
+  color: var(--bone-dim);
+}
+.reassurance p strong { color: var(--bone); font-weight:400; }
+
+/* bottom of left panel */
+.left-bottom {
+  opacity:0; animation: fadeIn 1s ease 1s forwards;
+}
+.coord-line {
+  font-family: var(--mono); font-size:9px;
+  letter-spacing:0.18em; color:rgba(184,168,152,0.3);
+  text-transform: uppercase; line-height:2;
+}
+.coord-line .lit { color:rgba(184,168,152,0.5); }
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  padding: 160px 48px 80px 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* email block */
+.email-block {
+  opacity:0; animation: fadeUp .9s cubic-bezier(.16,1,.3,1) .5s forwards;
+}
+.email-label {
+  font-family: var(--mono); font-size:9px;
+  letter-spacing:0.25em; color:var(--burn);
+  text-transform:uppercase; margin-bottom:14px;
+  display:flex; align-items:center; gap:10px;
+}
+.email-label::before { content:''; display:inline-block; width:16px; height:0.5px; background:var(--burn); }
+
+.email-address {
+  font-family: var(--display);
+  font-size: clamp(22px, 2.8vw, 36px);
+  font-weight: 600; letter-spacing:-0.01em;
+  color: var(--bone);
+  text-decoration: none;
+  display: inline-flex; align-items:center; gap:16px;
+  position: relative;
+  transition: color .3s;
+  line-height:1.1;
+}
+.email-address::after {
+  content:'';
+  position:absolute; bottom:-4px; left:0; right:0;
+  height:0.5px; background:var(--bone);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .4s cubic-bezier(.16,1,.3,1);
+}
+.email-address:hover { color:var(--burn); }
+.email-address:hover::after { transform:scaleX(1); background:var(--burn); }
+.email-arrow {
+  font-size:18px; color:var(--burn);
+  transition:transform .3s;
+  display:inline-block;
+}
+.email-address:hover .email-arrow { transform:translateX(6px); }
+
+.email-copy-btn {
+  display: inline-flex; align-items:center; gap:8px;
+  margin-top: 16px;
+  font-family: var(--mono); font-size:9px;
+  letter-spacing:0.2em; text-transform:uppercase;
+  color: var(--bone-dim);
+  background:none; border:0.5px solid rgba(255,255,255,0.1);
+  padding:7px 14px; cursor:none;
+  transition: border-color .2s, color .2s;
+}
+.email-copy-btn:hover { border-color:var(--burn); color:var(--burn); }
+.email-copy-btn.copied { border-color:rgba(78,170,120,0.5); color:rgba(78,170,120,0.8); }
+.copy-icon { width:10px; height:10px; }
+
+/* divider */
+.panel-divider {
+  margin: 48px 0;
+  height: 0.5px;
+  background: linear-gradient(to right, var(--border), transparent);
+  opacity:0; animation: fadeIn .8s ease .7s forwards;
+}
+
+/* what I'm open to */
+.open-to {
+  opacity:0; animation: fadeUp .8s ease .75s forwards;
+}
+.open-to-label {
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:0.25em; color:var(--burn);
+  text-transform:uppercase; margin-bottom:20px;
+  display:flex; align-items:center; gap:10px;
+}
+.open-to-label::before { content:''; display:inline-block; width:16px; height:0.5px; background:var(--burn); }
+
+.open-to-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.open-item {
+  padding: 16px 18px;
+  border: 0.5px solid rgba(255,255,255,0.07);
+  position:relative; overflow:hidden;
+  transition: border-color .3s;
+}
+.open-item::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background:var(--burn);
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .35s cubic-bezier(.16,1,.3,1);
+}
+.open-item:hover { border-color:rgba(255,255,255,0.14); }
+.open-item:hover::before { transform:scaleX(1); }
+.open-item-title {
+  font-family:var(--display); font-size:15px;
+  font-weight:700; text-transform:uppercase;
+  letter-spacing:0.02em; color:var(--bone);
+  margin-bottom:5px;
+}
+.open-item-desc {
+  font-size:11px; line-height:1.6;
+  color:var(--bone-dim);
+}
+
+/* another divider */
+.panel-divider2 {
+  margin: 40px 0;
+  height: 0.5px;
+  background: linear-gradient(to right, var(--border), transparent);
+  opacity:0; animation: fadeIn .8s ease .9s forwards;
+}
+
+/* the closing note */
+.closing-note {
+  opacity:0; animation: fadeUp .8s ease .95s forwards;
+}
+.closing-note p {
+  font-family: var(--display);
+  font-size: clamp(15px, 1.8vw, 21px);
+  font-weight:300; line-height:1.45;
+  letter-spacing:0.01em;
+  color: var(--bone-dim);
+  font-style:italic;
+}
+.closing-note p span { color:var(--bone); font-style:normal; }
+.closing-sig {
+  margin-top:18px;
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:0.2em; color:var(--titanium);
+  text-transform:uppercase;
+}
+
+/* ── BOTTOM BAR ── */
+.bottom-bar {
+  position: relative; z-index:1;
+  padding: 22px 48px;
+  border-top: 0.5px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.bottom-note {
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:0.18em; color:var(--bone-dim);
+  text-transform:uppercase;
+}
+.bottom-note span { color:var(--burn); }
+
+/* status dot */
+.status-live {
+  display:flex; align-items:center; gap:8px;
+  font-family:var(--mono); font-size:9px;
+  letter-spacing:0.18em; color:rgba(78,170,120,0.7);
+  text-transform:uppercase;
+}
+.status-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:rgba(78,170,120,0.8);
+  animation:pulse 2.5s ease-in-out infinite;
+}
+
+/* KEYFRAMES */
+@keyframes fadeIn  { from{opacity:0} to{opacity:1} }
+@keyframes fadeUp  { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes pulse   { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+::-webkit-scrollbar { width:2px; }
+::-webkit-scrollbar-track { background:var(--void); }
+::-webkit-scrollbar-thumb { background:var(--burn); }
+
+@media(max-width:900px) {
+  .connect-wrap { grid-template-columns:1fr; }
+  .left-panel { border-right:none; border-bottom:0.5px solid var(--border); padding:140px 24px 56px; }
+  .right-panel { padding:56px 24px 80px; }
+  nav, .bottom-bar { padding-left:24px; padding-right:24px; }
+  .open-to-grid { grid-template-columns:1fr; }
+  nav::after { left:24px; right:24px; }
+}
+
+  /* ── PAGE TRANSITIONS ── */
+  .page-transition-out {
+    animation: pageOut 0.35s cubic-bezier(0.4,0,1,1) forwards;
+  }
+  @keyframes pageOut {
+    from { opacity:1; transform:translateX(0); }
+    to   { opacity:0; transform:translateX(-18px); }
+  }
+  @keyframes pageIn {
+    from { opacity:0; transform:translateX(18px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  body { animation: pageIn 0.45s cubic-bezier(0,0,0.3,1) both; }
+
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="cursor">
+  <svg viewBox="0 0 20 20" fill="none">
+    <line x1="10" y1="0" x2="10" y2="7" stroke="#E05A1A" stroke-width="0.8"/>
+    <line x1="10" y1="13" x2="10" y2="20" stroke="#E05A1A" stroke-width="0.8"/>
+    <line x1="0" y1="10" x2="7" y2="10" stroke="#E05A1A" stroke-width="0.8"/>
+    <line x1="13" y1="10" x2="20" y2="10" stroke="#E05A1A" stroke-width="0.8"/>
+    <circle cx="10" cy="10" r="2" stroke="#E05A1A" stroke-width="0.8"/>
+  </svg>
+</div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">A<span>.</span>Z — <span>001</span></a>
+  <ul class="nav-links">
+    <li><a href="work.html">Work</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="journey.html">Journey</a></li>
+    <li><a href="connect.html" class="active">Connect</a></li>
+  </ul>
+</nav>
+
+<div class="connect-wrap">
+
+  <!-- ── LEFT ── -->
+  <div class="left-panel">
+    <div class="left-top">
+
+      <div class="panel-eyebrow">Get in Touch</div>
+
+      <h1 class="panel-title">
+        Let's<br>
+        <span class="ghost">Talk</span>
+      </h1>
+
+      <div class="panel-statement">
+        <p>
+          If something I've built made you curious,
+          if you have a problem worth solving,
+          or if you just want to talk about
+          <span class="accent">Koenigsegg, quantum mechanics, or house music</span> —
+          <em>that's enough of a reason.</em>
+        </p>
+      </div>
+
+      <div class="reassurance">
+        <p>
+          I don't bite, I don't ignore good conversations, and I'm not too busy for the right one.
+          <strong>The worst that happens is we learn something from each other.</strong>
+          Send the message you've been overthinking.
+        </p>
+      </div>
+
+    </div>
+
+    <div class="left-bottom">
+      <div class="coord-line">
+        <span class="lit">Based in</span> — Greater Toronto Area, Canada<br>
+        <span class="lit">Open to</span> — Collaboration · Opportunities · Ideas<br>
+        <span class="lit">Response time</span> — Fast. I check my email.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT ── -->
+  <div class="right-panel">
+
+    <!-- Email -->
+    <div class="email-block">
+      <div class="email-label">Direct Line</div>
+      <a href="mailto:artin.zainalpour@gmail.com" class="email-address">
+        artin.zainalpour@gmail.com
+        <span class="email-arrow">→</span>
+      </a>
+      <br>
+      <button class="email-copy-btn" id="copyBtn" onclick="copyEmail()">
+        <svg class="copy-icon" viewBox="0 0 10 10" fill="none">
+          <rect x="3" y="3" width="6" height="6" rx="0.5" stroke="currentColor" stroke-width="0.8"/>
+          <path d="M1 7V1h6" stroke="currentColor" stroke-width="0.8" fill="none"/>
+        </svg>
+        <span id="copyLabel">Copy Address</span>
+      </button>
+    </div>
+
+    <div class="panel-divider"></div>
+
+    <!-- What I'm open to -->
+    <div class="open-to">
+      <div class="open-to-label">What I'm Open To</div>
+      <div class="open-to-grid">
+        <div class="open-item">
+          <div class="open-item-title">Collaboration</div>
+          <p class="open-item-desc">You have a problem that needs building. Let's figure it out together.</p>
+        </div>
+        <div class="open-item">
+          <div class="open-item-title">Opportunities</div>
+          <p class="open-item-desc">Internships, co-ops, projects. If it pushes limits, I'm interested.</p>
+        </div>
+        <div class="open-item">
+          <div class="open-item-title">Modulus Orders</div>
+          <p class="open-item-desc">Custom 3D design and printing. Bring your brief — I'll make it real.</p>
+        </div>
+        <div class="open-item">
+          <div class="open-item-title">Good Conversation</div>
+          <p class="open-item-desc">Engineering, aviation, physics, tennis, music. Pick one and go.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-divider2"></div>
+
+    <!-- Closing note -->
+    <div class="closing-note">
+      <p>
+        "Every great collaboration started with someone
+        deciding <span>the idea was worth a message.</span>
+        This is that message box."
+      </p>
+      <div class="closing-sig">— A.Z · GTA · 2025</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Bottom bar -->
+<div class="bottom-bar">
+  <div class="bottom-note">
+    Artin Zainalpour · <span>artin.zainalpour@gmail.com</span> · GTA, Canada
+  </div>
+  <div class="status-live">
+    <span class="status-dot"></span>
+    Available
+  </div>
+</div>
+
+<script>
+
+
+  function animRing(){
+    rx+=(mx-rx)*0.13;
+    ry+=(my-ry)*0.13;
+    ring.style.left=rx+'px';
+    ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+  // Hide custom cursor when mouse leaves window
+  document.addEventListener('mouseleave',function(){
+    cursor.style.opacity='0'; ring.style.opacity='0';
+  });
+  document.addEventListener('mouseenter',function(){
+    cursor.style.opacity='1'; ring.style.opacity='1';
+  });
+})();
+
+document.querySelectorAll('a,button,.open-item').forEach(el=>{
+  el.add

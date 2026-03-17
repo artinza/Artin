@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — Artin Zainalpour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Barlow:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --void: #080808;
+  --bone: #EDE8DF;
+  --bone-dim: #A09890;
+  --titanium: #B8A898;
+  --burn: #E05A1A;
+  --burn-dim: rgba(224,90,26,0.12);
+  --grid: rgba(255,255,255,0.028);
+  --border: rgba(255,255,255,0.07);
+  --mono: 'JetBrains Mono', monospace;
+  --display: 'Barlow Condensed', sans-serif;
+  --body: 'Barlow', sans-serif;
+}
+
+html { scroll-behavior: smooth; cursor:none; }
+body {
+  background: var(--void);
+  color: var(--bone);
+  font-family: var(--body);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+
+/* CURSOR */
+#cursor {
+    position: fixed;
+    top: 0; left: 0;
+    width: 20px; height: 20px;
+    pointer-events: none;
+    z-index: 99999;
+    will-change: transform;
+  }
+  #cursor svg { width: 100%; height: 100%; }
+  #cursor-ring {
+    position: fixed;
+    top: 0; left: 0;
+    width: 40px; height: 40px;
+    border: 0.5px solid rgba(224,90,26,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    will-change: transform;
+    transition: width .3s ease, height .3s ease, opacity .3s ease;
+  }
+body.hovering #cursor-ring { width:60px; height:60px; }
+#progress-bar { position:fixed; top:0; left:0; height:1px; background:var(--burn); width:0%; z-index:200; }
+
+/* NAV */
+nav { position:fixed; top:0; left:0; right:0; z-index:100; display:flex; justify-content:space-between; align-items:center; padding:28px 48px; }
+nav::after { content:''; position:absolute; bottom:0; left:48px; right:48px; height:0.5px; background:rgba(255,255,255,0.08); }
+.nav-logo { font-family:var(--mono); font-size:11px; letter-spacing:0.2em; color:var(--bone-dim); text-transform:uppercase; text-decoration:none; }
+.nav-logo span { color:var(--burn); }
+.nav-links { display:flex; gap:36px; list-style:none; }
+.nav-links a { font-family:var(--mono); font-size:10px; letter-spacing:0.2em; color:var(--bone-dim); text-decoration:none; text-transform:uppercase; transition:color .2s; position:relative; }
+.nav-links a::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:0.5px; background:var(--burn); transition:width .3s; }
+.nav-links a:hover { color:var(--bone); }
+.nav-links a:hover::after { width:100%; }
+.nav-links a.active { color:var(--burn); }
+
+/* ─── ABOUT HERO ─── */
+.about-hero {
+  position: relative; z-index: 1;
+  padding: 160px 48px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: end;
+  border-bottom: 0.5px solid var(--border);
+}
+.hero-left {}
+.hero-eyebrow {
+  font-family: var(--mono); font-size:10px; letter-spacing:0.3em;
+  color:var(--burn); text-transform:uppercase;
+  display:flex; align-items:center; gap:12px;
+  margin-bottom:20px;
+  opacity:0; animation: fadeUp .8s ease .1s forwards;
+}
+.hero-eyebrow::before { content:''; display:inline-block; width:24px; height:0.5px; background:var(--burn); }
+.hero-name {
+  font-family: var(--display);
+  font-size: clamp(52px, 7vw, 96px);
+  font-weight: 700; letter-spacing:-0.02em;
+  text-transform: uppercase; line-height: 0.92;
+  opacity:0; animation: fadeUp .9s cubic-bezier(.16,1,.3,1) .2s forwards;
+}
+.hero-name .ghost { -webkit-text-stroke:1px rgba(237,232,223,0.2); color:transparent; display:block; }
+.hero-meta {
+  margin-top: 36px;
+  opacity:0; animation: fadeUp .8s ease .4s forwards;
+}
+.meta-row {
+  display: flex; align-items:baseline; gap:16px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid rgba(255,255,255,0.05);
+}
+.meta-row:first-child { border-top: 0.5px solid rgba(255,255,255,0.05); }
+.meta-key { font-family:var(--mono); font-size:9px; letter-spacing:0.2em; color:var(--burn); text-transform:uppercase; min-width:100px; }
+.meta-val { font-size:13px; color:var(--bone-dim); letter-spacing:0.02em; }
+.meta-val strong { color:var(--bone); font-weight:400; }
+
+.hero-right {
+  opacity:0; animation: fadeUp .8s ease .5s forwards;
+}
+.opening-statement {
+  font-family: var(--display);
+  font-size: clamp(20px, 2.4vw, 30px);
+  font-weight: 300;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: var(--bone);
+}
+.opening-statement em {
+  font-style: italic;
+  color: var(--bone-dim);
+}
+.opening-statement .accent { color: var(--burn); font-style:normal; }
+.hero-cities {
+  margin-top: 32px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  color: rgba(184,168,152,0.4);
+  text-transform: uppercase;
+  display: flex; gap: 8px; align-items: center;
+}
+.city-dot { width:3px; height:3px; background:var(--burn); border-radius:50%; opacity:0.6; }
+
+/* ─── STORY SECTION ─── */
+.story-section {
+  position: relative; z-index:1;
+  padding: 80px 48px;
+  border-bottom: 0.5px solid var(--border);
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 80px;
+}
+.section-label-vert {
+  font-family: var(--mono); font-size:10px; letter-spacing:0.3em;
+  color: var(--burn); text-transform:uppercase;
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  align-self: start;
+  padding-top: 6px;
+  display: flex; align-items:center; gap:10px;
+  opacity:0;
+}
+.section-label-vert::before { content:''; display:inline-block; width:0.5px; height:20px; background:var(--burn); }
+.section-label-vert.visible { animation: fadeIn .8s ease forwards; }
+
+.story-body {}
+.story-lead {
+  font-family: var(--display);
+  font-size: clamp(28px, 3.5vw, 44px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+  color: var(--bone);
+  opacity:0;
+}
+.story-lead.visible { animation: fadeUp .8s cubic-bezier(.16,1,.3,1) forwards; }
+.story-lead .dim { color: rgba(237,232,223,0.25); }
+
+.story-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  opacity:0;
+}
+.story-cols.visible { animation: fadeUp .8s ease .1s forwards; }
+.story-col p {
+  font-size: 14px; line-height: 1.85;
+  color: var(--bone-dim); letter-spacing: 0.02em;
+  margin-bottom: 20px;
+}
+.story-col p:last-child { margin-bottom:0; }
+.story-col p strong { color: var(--bone); font-weight: 400; }
+.story-col p .burn { color: var(--burn); }
+
+/* ─── APPROACH SECTION ─── */
+.approach-section {
+  position: relative; z-index:1;
+  padding: 80px 48px;
+  border-bottom: 0.5px solid var(--border);
+}
+.approach-header {
+  display: flex; align-items:baseline; gap:32px;
+  margin-bottom: 60px;
+}
+.approach-title {
+  font-family: var(--display);
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 700; text-transform:uppercase;
+  letter-spacing: -0.02em; line-height:0.9;
+  opacity:0;
+}
+.approach-title.visible { animation: fadeUp .9s cubic-bezier(.16,1,.3,1) forwards; }
+.approach-title .ghost { -webkit-text-stroke:1px rgba(237,232,223,0.15); color:transparent; }
+.approach-sub {
+  max-width: 300px;
+  font-size:13px; line-height:1.7;
+  color:var(--bone-dim); opacity:0;
+}
+.approach-sub.visible { animation: fadeUp .8s ease .15s forwards; }
+
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+}
+.principle-card {
+  background: var(--void);
+  padding: 36px 32px;
+  position: relative;
+  overflow: hidden;
+  opacity:0; transform: translateY(16px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.principle-card.visible { opacity:1; transform:translateY(0); }
+.principle-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background:var(--burn);
+  transform:scaleX(0); transform-origin:left;
+  transition: transform .4s cubic-bezier(.16,1,.3,1);
+}
+.principle-card:hover::before { transform:scaleX(1); }
+.principle-num {
+  font-family: var(--mono); font-size:9px;
+  letter-spacing:0.2em; color:var(--burn);
+  margin-bottom: 20px;
+  display:block;
+}
+.principle-title {
+  font-family: var(--display);
+  font-size: 22px; font-weight:700;
+  text-transform:uppercase; letter-spacing:0.01em;
+  line-height:1.1; margin-bottom:14px;
+  color:var(--bone);
+}
+.principle-body {
+  font-size:13px; line-height:1.75;
+  color:var(--bone-dim); letter-spacing:0.02em;
+}
+
+/* ─── BEYOND SECTION ─── */
+.beyond-section {
+  position: relative; z-index:1;
+  padding: 80px 48px;
+  border-bottom: 0.5px solid var(--border);
+}
+.beyond-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-top: 48px;
+}
+.beyond-item {
+  opacity:0; transform:translateY(12px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.beyond-item.visible { opacity:1; transform:translateY(0); }
+.beyond-icon {
+  font-family: var(--mono); font-size: 20px;
+  color: var(--burn); margin-bottom:14px;
+  display:block; letter-spacing:0;
+}
+.beyond-label {
+  font-family: var(--display); font-size:18px;
+  font-weight:700; text-transform:uppercase;
+  letter-spacing:0.02em; margin-bottom:8px;
+  color:var(--bone);
+}
+.beyond-desc {
+  font-size:12px; line-height:1.7;
+  color:var(--bone-dim);
+}
+
+/* ─── IDOLS ─── */
+.idols-section {
+  position: relative; z-index:1;
+  padding: 80px 48px;
+  border-bottom: 0.5px solid var(--border);
+}
+.idols-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  margin-top: 48px;
+}
+.idol-card {
+  background: var(--void);
+  padding: 40px 32px;
+  opacity:0; transform:translateY(12px);
+  transition: opacity .5s, transform .5s;
+}
+.idol-card.visible { opacity:1; transform:translateY(0); }
+.idol-initial {
+  font-family: var(--display);
+  font-size: 72px; font-weight:700;
+  line-height:1; letter-spacing:-0.03em;
+  color:transparent;
+  -webkit-text-stroke: 1px rgba(224,90,26,0.35);
+  margin-bottom:20px; display:block;
+  transition: -webkit-text-stroke-color .3s;
+}
+.idol-card:hover .idol-initial { -webkit-text-stroke-color: rgba(224,90,26,0.8); }
+.idol-name {
+  font-family: var(--display); font-size:22px;
+  font-weight:700; text-transform:uppercase;
+  letter-spacing:0.02em; margin-bottom:6px;
+  color:var(--bone);
+}
+.idol-role {
+  font-family: var(--mono); font-size:9px;
+  letter-spacing:0.2em; color:var(--burn);
+  text-transform:uppercase; margin-bottom:16px;
+}
+.idol-body {
+  font-size:13px; line-height:1.75;
+  color:var(--bone-dim);
+}
+
+/* ════════════════════════════
+   MANIFESTO PAGE (same file, scrolls below)
+   ════════════════════════════ */
+.manifesto-divider {
+  position: relative; z-index:1;
+  padding: 80px 48px 60px;
+  border-top: 0.5px solid rgba(255,255,255,0.12);
+  display: flex; align-items:center; gap:32px;
+}
+.manifesto-divider::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:1px;
+  background: linear-gradient(to right, var(--burn), transparent 60%);
+}
+.manifesto-title-block { flex:1; }
+.manifesto-eyebrow {
+  font-family:var(--mono); font-size:10px;
+  letter-spacing:0.3em; color:var(--burn);
+  text-transform:uppercase; margin-bottom:16px;
+  display:flex; align-items:center; gap:12px;
+  opacity:0;
+}
+.manifesto-eyebrow::before { content:''; display:inline-block; width:24px; height:0.5px; background:var(--burn); }
+.manifesto-eyebrow.visible { animation: fadeIn .8s ease forwards; }
+.manifesto-main-title {
+  font-family:var(--display);
+  font-size: clamp(52px, 8vw, 110px);
+  font-weight:700; text-transform:uppercase;
+  letter-spacing:-0.02em; line-height:0.88;
+  opacity:0;
+}
+.manifesto-main-title .ghost { -webkit-text-stroke:1px rgba(237,232,223,0.15); color:transparent; display:block; }
+.manifesto-main-title.visible { animation: fadeUp .9s cubic-bezier(.16,1,.3,1) .1s forwards; }
+.manifesto-intro {
+  max-width: 480px;
+  font-size:14px; line-height:1.8;
+  color:var(--bone-dim); margin-top:32px;
+  opacity:0;
+}
+.manifesto-intro.visible { animation: fadeUp .8s ease .2s forwards; }
+.manifesto-intro strong { color:var(--bone); font-weight:400; }
+
+/* Axiom items */
+.axioms-section {
+  position: relative; z-index:1;
+  padding: 0 48px 80px;
+}
+.axiom {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0;
+  border-bottom: 0.5px solid var(--border);
+  padding: 48px 0;
+  opacity:0; transform:translateY(16px);
+  transition: opacity .6s ease, transform .6s ease;
+  position: relative;
+}
+.axiom.visible { opacity:1; transform:translateY(0); }
+.axiom::before {
+  content:'';
+  position:absolute; left:80px; top:0; bottom:0; width:0.5px;
+  background: rgba(255,255,255,0.05);
+}
+.axiom:hover .axiom-body { color: var(--bone); }
+.axiom-num {
+  font-family:var(--mono); font-size:11px;
+  letter-spacing:0.15em; color:var(--burn);
+  padding-top: 6px;
+  align-self:start;
+}
+.axiom-content { padding-left: 40px; }
+.axiom-title {
+  font-family:var(--display);
+  font-size: clamp(26px, 3vw, 38px);
+  font-weight:700; text-transform:uppercase;
+  letter-spacing:-0.01em; line-height:1.05;
+  margin-bottom:16px; color:var(--bone);
+}
+.axiom-body {
+  font-size:14px; line-height:1.85;
+  color:var(--bone-dim); letter-spacing:0.02em;
+  max-width:680px;
+  transition: color .3s;
+}
+.axiom-body em { font-style:italic; color:var(--titanium); }
+.axiom-tag {
+  display:inline-block; margin-top:16px;
+  font-family:var(--mono); font-size:8px;
+  letter-spacing:0.2em; text-transform:uppercase;
+  color:var(--burn); border:0.5px solid rgba(224,90,26,0.3);
+  padding:4px 10px;
+}
+
+/* Pull quote */
+.pull-quote-block {
+  position: relative; z-index:1;
+  padding: 80px 48px;
+  border-top: 0.5px solid var(--border);
+  border-bottom: 0.5px solid var(--border);
+  display:flex; align-items:center; gap:48px;
+  overflow:hidden;
+}
+.pq-number {
+  font-family:var(--display);
+  font-size: clamp(100px, 18vw, 200px);
+  font-weight:700; line-height:1;
+  color:transparent;
+  -webkit-text-stroke:1px rgba(224,90,26,0.08);
+  position:absolute; left:32px; top:50%;
+  transform:translateY(-50%);
+  pointer-events:none;
+  letter-spacing:-0.05em;
+}
+.pq-text {
+  position:relative; z-index:1;
+  max-width: 700px;
+  font-family:var(--display);
+  font-size: clamp(24px, 3vw, 42px);
+  font-weight:300; line-height:1.3;
+  letter-spacing:0.01em; color:var(--bone);
+  margin:0 auto;
+  opacity:0;
+}
+.pq-text.visible { animation: fadeUp .9s cubic-bezier(.16,1,.3,1) forwards; }
+.pq-text .accent { color:var(--burn); }
+.pq-attr {
+  font-family:var(--mono); font-size:10px;
+  letter-spacing:0.2em; color:var(--bone-dim);
+  text-transform:uppercase; display:block;
+  margin-top:20px;
+}
+
+/* Footer strip */
+.footer-strip {
+  position:relative; z-index:1;
+  padding:28px 48px;
+  border-top:0.5px solid var(--border);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.footer-note { font-family:var(--mono); font-size:10px; letter-spacing:0.15em; color:var(--bone-dim); text-transform:uppercase; }
+.footer-note span { color:var(--burn); }
+.nav-arrow { font-family:var(--display); font-size:13px; font-weight:600; letter-spacing:0.2em; color:var(--bone); text-decoration:none; text-transform:uppercase; display:flex; align-items:center; gap:10px; transition:color .2s; }
+.nav-arrow::after { content:'→'; color:var(--burn); transition:transform .3s; }
+.nav-arrow:hover { color:var(--burn); }
+.nav-arrow:hover::after { transform:translateX(5px); }
+
+/* KEYFRAMES */
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+::-webkit-scrollbar { width:2px; }
+::-webkit-scrollbar-track { background:var(--void); }
+::-webkit-scrollbar-thumb { background:var(--burn); }
+
+@media(max-width:900px) {
+  .about-hero, .story-section { grid-template-columns:1fr; gap:40px; }
+  .story-cols, .principles-grid, .beyond-grid, .idols-grid { grid-template-columns:1fr; }
+  .principles-grid, .idols-grid { background:none; gap:1px; }
+  nav, .about-hero, .story-section, .approach-section, .beyond-section, .idols-section, .manifesto-divider, .axioms-section, .pull-quote-block, .footer-strip { padding-left:24px; padding-right:24px; }
+}
+
+  /* ── PAGE TRANSITIONS ── */
+  .page-transition-out {
+    animation: pageOut 0.35s cubic-bezier(0.4,0,1,1) forwards;
+  }
+  @keyframes pageOut {
+    from { opacity:1; transform:translateX(0); }
+    to   { opacity:0; transform:translateX(-18px); }
+  }
+  @keyframes pageIn {
+    from { opacity:0; transform:translateX(18px); }
+    to   { opacity:1; transform:translateX(0); }
+  }
+  body { animation: pageIn 0.45s cubic-bezier(0,0,0.3,1) both; }
+
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div id="cursor"><svg viewBox="0 0 20 20" fill="none"><line x1="10" y1="0" x2="10" y2="7" stroke="#E05A1A" stroke-width="0.8"/><line x1="10" y1="13" x2="10" y2="20" stroke="#E05A1A" stroke-width="0.8"/><line x1="0" y1="10" x2="7" y2="10" stroke="#E05A1A" stroke-width="0.8"/><line x1="13" y1="10" x2="20" y2="10" stroke="#E05A1A" stroke-width="0.8"/><circle cx="10" cy="10" r="2" stroke="#E05A1A" stroke-width="0.8"/></svg></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">A<span>.</span>Z — <span>001</span></a>
+  <ul class="nav-links">
+    <li><a href="work.html">Work</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+    <li><a href="journey.html">Journey</a></li>
+    <li><a href="connect.html">Connect</a></li>
+  </ul>
+</nav>
+
+<!-- ══ ABOUT HERO ══ -->
+<section class="about-hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">About the Engineer</div>
+    <h1 class="hero-name">
+      Artin<br>
+      Zainal<span class="ghost">pour</span>
+    </h1>
+    <div class="hero-meta">
+      <div class="meta-row">
+        <span class="meta-key">Age</span>
+        <span class="meta-val"><strong>17</strong> — turning 18 in October</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-key">School</span>
+        <span class="meta-val"><strong>Earl Haig Secondary</strong>, Toronto</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-key">Origin</span>
+        <span class="meta-val">Tehran → Khoy → Amsterdam → <strong>GTA</strong></span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-key">Languages</span>
+        <span class="meta-val">Dutch · English · Farsi · Azari · Deutsch A2</span>
+      </div>
+      <div class="meta-row">
+        <span class="meta-key">Cities</span>
+        <span class="meta-val"><strong>115</strong> and counting</span>
+      </div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <p class="opening-statement">
+      Engineering isn't what I do —
+      <em>it's how I see the world.</em>
+      Every system, every object, every problem is
+      <span class="accent">a puzzle waiting to be understood,</span>
+      dismantled, and rebuilt better.
+    </p>
+    <p class="opening-statement" style="margin-top:24px; font-size:clamp(15px,1.6vw,20px); color:var(--bone-dim);">
+      I'm 17. I've built smart home systems, industrial control software, aerodynamic wings, and trading engines. I coach tennis. I've visited 115 cities. I'm just getting started.
+    </p>
+    <div class="hero-cities">
+      <span>Tehran</span>
+      <span class="city-dot"></span>
+      <span>Khoy</span>
+      <span class="city-dot"></span>
+      <span>Amsterdam</span>
+      <span class="city-dot"></span>
+      <span>Toronto</span>
+      <span class="city-dot"></span>
+      <span>115 Cities</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══ STORY ══ -->
+<section class="story-section">
+  <div class="section-label-vert" id="storyLabel">The Story</div>
+  <div class="story-body">
+    <div class="story-lead" id="storyLead">
+      Born in Tehran.<br>
+      <span class="dim">Raised everywhere.</span><br>
+      Built by movement.
+    </div>
+    <div class="story-cols" id="storyCols">
+      <div class="story-col">
+        <p>I was born in <strong>Tehran, Iran</strong>, to parents from Khoy — an Azerbaijani city in the northwest. At 8, we moved to the <strong>Netherlands</strong>, where I spent five years. Then Toronto. Three countries, multiple languages, and more airports than most people see in a lifetime.</p>
+        <p>That kind of life doesn't let you get comfortable. It teaches you to <strong>adapt fast, solve fast, and move forward</strong> — to not dwell, not over-attach, and to find your footing in any environment. Every time I landed somewhere new, I had to rebuild: friendships, language, identity. You learn to treat disruption as <span class="burn">data, not disaster.</span></p>
+      </div>
+      <div class="story-col">
+        <p>There was never a single eureka moment that turned me into an engineer. Engineering is a <strong>lifestyle</strong> — it seeped in through my father, a software developer who always had something interesting to show me. We share knowledge like a feedback loop: I learn something new, I go explain it to him. That back-and-forth sharpened me more than any classroom.</p>
+        <p>At 17, I'm in my senior year at Earl Haig. I've chosen to <strong>pause, breathe, and grow as a person</strong> — my social confidence, my charisma, my sense of self. I've built things that impressed engineers twice my age. Now I'm building myself. <span class="burn">That's the hardest project yet.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ HOW I THINK ══ -->
+<section class="approach-section">
+  <div class="approach-header">
+    <div>
+      <h2 class="approach-title" id="approachTitle">How I<br><span class="ghost">Think</span></h2>
+    </div>
+    <p class="approach-sub" id="approachSub">Not the tools. Not the output. The mental model beneath everything — the way I approach any system, any problem, any challenge.</p>
+  </div>
+
+  <div class="principles-grid">
+    <div class="principle-card" style="transition-delay:.05s">
+      <span class="principle-num">01 — Method</span>
+      <div class="principle-title">Zoom In,<br>Then Zoom Out</div>
+      <p class="principle-body">I break every problem into its smallest components — understanding each part's role, properties, and purpose. Then I step back and see how they interact. The full picture only makes sense once you've understood every piece. That's how you find the gaps others miss.</p>
+    </div>
+    <div class="principle-card" style="transition-delay:.1s">
+      <span class="principle-num">02 — Mindset</span>
+      <div class="principle-title">The Limit Is<br>The Starting Line</div>
+      <p class="principle-body">I'm not interested in what's already been done. The interesting work happens at the edge of what's considered possible. I treat limitations as specifications — they define the shape of the solution, not the reason to stop.</p>
+    </div>
+    <div class="principle-card" style="transition-delay:.15s">
+      <span class="principle-num">03 — Inner Game</span>
+      <div class="principle-title">Quiet the<br>Inner Critic</div>
+      <p class="principle-body">From tennis I learned this: the self-critical voice doesn't make you better, it makes you slower. Real performance comes from presence — trusting your training, silencing the doubt, and letting your natural ability take over. On the court and in the lab.</p>
+    </div>
+    <div class="principle-card" style="transition-delay:.2s">
+      <span class="principle-num">04 — Engineering</span>
+      <div class="principle-title">It Is<br>Art</div>
+      <p class="principle-body">A Koenigsegg One:1. A Saturn V. An F-22. These are not machines — they are the frozen decisions of brilliant people who refused to compromise. Engineering done right is indistinguishable from art. I hold my own work to that standard.</p>
+    </div>
+    <div class="principle-card" style="transition-delay:.25s">
+      <span class="principle-num">05 — Life</span>
+      <div class="principle-title">Adapt.<br>Don't Dwell.</div>
+      <p class="principle-body">Moving between countries taught me that attachment to a fixed reality is a liability. Problems — external or internal — are best solved fast and completely. Learn what they're teaching you, then move forward. Stagnation is the only real failure.</p>
+    </div>
+    <div class="principle-card" style="transition-delay:.3s">
+      <span class="principle-num">06 — Purpose</span>
+      <div class="principle-title">Build<br>Something Lasting</div>
+      <p class="principle-body">I believe I'm here to contribute to something greater — to be part of movements that push humanity forward. NASA, SpaceX, the next frontier. Whatever form it takes, the purpose is the same: go further than what came before, and leave something worth finding.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ BEYOND ══ -->
+<section class="beyond-section">
+  <div class="hero-eyebrow" style="opacity:0" id="beyondLabel">Beyond Engineering</div>
+  <div class="beyond-grid">
+    <div class="beyond-item" style="transition-delay:.05s">
+      <span class="beyond-icon">✈</span>
+      <div class="beyond-label">115 Cities</div>
+      <p class="beyond-desc">Born a traveller. The goal: a private pilot licence and a plane to take anywhere. The world is a system worth exploring every node of.</p>
+    </div>
+    <div class="beyond-item" style="transition-delay:.1s">
+      <span class="beyond-icon">◉</span>
+      <div class="beyond-label">House Music</div>
+      <p class="beyond-desc">The energy, the architecture of sound, the precision in the mix — working on getting into DJing. It's just engineering in a different frequency.</p>
+    </div>
+    <div class="beyond-item" style="transition-delay:.15s">
+      <span class="beyond-icon">◈</span>
+      <div class="beyond-label">Cars & Planes</div>
+      <p class="beyond-desc">My room is filled with them. A Koenigsegg isn't a car — it's a declaration. A fighter jet isn't a vehicle — it's an argument for what's possible.</p>
+    </div>
+    <div class="beyond-item" style="transition-delay:.2s">
+      <span class="beyond-icon">⊕</span>
+      <div class="beyond-label">Tennis</div>
+      <p class="beyond-desc">7 years competitive, now coaching. The court taught me everything about pressure, strategy, and the inner game. My friends say the most dangerous version of me hasn't arrived yet.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ IDOLS ══ -->
+<section class="idols-section">
+  <div class="hero-eyebrow" style="opacity:0" id="idolsLabel">Who Shaped Me</div>
+  <div class="idols-grid">
+    <div class="idol-card" style="transition-delay:.05s">
+      <span class="idol-initial">D</span>
+      <div class="idol-name">My Father</div>
+      <div class="idol-role">Software Developer · First Teacher</div>
+      <p class="idol-body">He didn't just show me technology — he showed me the joy of understanding things deeply. Our dynamic is a feedback loop: I learn, I explain, he pushes further. He is the reason engineering feels like home. Every project I ship has his fingerprints on it.</p>
+    </div>
+    <div class="idol-card" style="transition-delay:.1s">
+      <span class="idol-initial">N</span>
+      <div class="idol-name">Nikola Tesla</div>
+      <div class="idol-role">Inventor · True Artist</div>
+      <p class="idol-body">He invented from love, not ambition. His work was stolen, his recognition denied, and he kept building — because being an inventor was the point, not the reward. That's the standard. Create because you must, not because you'll be credited.</p>
+    </div>
+    <div class="idol-card" style="transition-delay:.15s">
+      <span class="idol-initial">D</span>
+      <div class="idol-name">David Bohm</div>
+      <div class="idol-role">Physicist · Systems Thinker</div>
+      <p class="idol-body">Bohm saw reality as an undivided whole — every part implicate in every other. That's how I see engineering: not isolated components but a living system where everything interacts with everything. His concept of the implicate order changed how I think about design.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════
+     MANIFESTO
+     ══════════════════════════════════ -->
+<div class="manifesto-divider" id="manifesto">
+  <div class="manifesto-title-block">
+    <div class="manifesto-eyebrow" id="mfEyebrow">Operating System</div>
+    <h2 class="manifesto-main-title" id="mfTitle">
+      Mani<br><span class="ghost">festo</span>
+    </h2>
+    <p class="manifesto-intro" id="mfIntro">
+      These are not aspirations. They are the principles I have already tested — on the court, at the workbench, in new countries, and in my own head. <strong>This is how I actually operate.</strong>
+    </p>
+  </div>
+</div>
+
+<section class="axioms-section">
+
+  <div class="axiom" id="ax1">
+    <div class="axiom-num">AX · 01</div>
+    <div class="axiom-content">
+      <div class="axiom-title">Engineering Is a Lifestyle, Not a Career</div>
+      <p class="axiom-body">
+        I don't switch engineering on when I sit at a desk and off when I leave. I look at a vent and think about airflow. I watch a plane and calculate lift. I hear a noise in an engine and wonder what's failing. This is not a job description — it is a way of <em>perceiving everything</em>. You either live it or you don't.
+      </p>
+      <span class="axiom-tag">Philosophy</span>
+    </div>
+  </div>
+
+  <div class="axiom" id="ax2">
+    <div class="axiom-num">AX · 02</div>
+    <div class="axiom-content">
+      <div class="axiom-title">Understand Every Component Before You Judge the System</div>
+      <p class="axiom-body">
+        The most dangerous thing in engineering — and in life — is forming an opinion about the whole before you understand the parts. I force myself to zoom in first: what is this piece? What is its role? What are its constraints? What does it interact with? Only then do I zoom out. <em>Skipping this step is how catastrophic failures are built.</em>
+      </p>
+      <span class="axiom-tag">Method</span>
+    </div>
+  </div>
+
+  <div class="axiom" id="ax3">
+    <div class="axiom-num">AX · 03</div>
+    <div class="axiom-content">
+      <div class="axiom-title">The Limit Is Information, Not a Wall</div>
+      <p class="axiom-body">
+        When I hit a boundary — technical, personal, social — I treat it as a data point. It tells me about the shape of the problem, the properties of the system, the gaps I haven't filled yet. Limits are not reasons to stop. They are <em>the most useful thing a problem can tell you.</em>
+      </p>
+      <span class="axiom-tag">Mindset</span>
+    </div>
+  </div>
+
+  <div class="axiom" id="ax4">
+    <div class="axiom-num">AX · 04</div>
+    <div class="axiom-content">
+      <div class="axiom-title">Silence the Critic. Trust the Training.</div>
+      <p class="axiom-body">
+        Tennis taught me this clearly. The moment you start narrating your own failures mid-performance, you've already lost. The inner critic doesn't improve your output — it interrupts it. Real precision comes from presence, not self-surveillance. Learn from the miss, then <em>let it go and play the next point.</em>
+      </p>
+      <span class="axiom-tag">Inner Game</span>
+    </div>
+  </div>
+
+  <div class="axiom" id="ax5">
+    <div class="axiom-num">AX · 05</div>
+    <div class="axiom-content">
+      <div class="axiom-title">Disruption Is Data. Don't Dwell.</div>
+      <p class="axiom-body">
+        I've moved countries multiple times, rebuilt social circles from zero, learned new languages mid-childhood. Each time, I had one choice: adapt or stagnate. I learned to treat upheaval as a fast-track education. Disruption strips away what isn't essential and shows you what you're actually made of. <em>The faster you process it, the faster you grow.</em>
+      </p>
+      <span class="axiom-tag">Resilience</span>
+    </div>
+  </div>
+
+  <div class="axiom" id="ax6">
+    <div class="axiom-num">AX · 06</div>
+    <div class="axiom-content">
+      <div class="axiom-title">Precision Is a Form of Respect</div>
+      <p class="axiom-body">
+        When I build something — a CAD model, a dashboard, a piece of code — the level of precision I bring to it is a statement about how seriously I take the work. Sloppy tolerances, lazy naming conventions, poorly documented code: these are not small things. <em>They are a signal of how much you care.</em> I care. The detail shows.
+      </p>
+      <span class="axiom-tag">Craft</span>
+    </div>
+  </div>
+
+  <div class="axiom" id="ax7">
+    <div class="axiom-num">AX · 07</div>
+    <div class="axiom-content">
+      <div class="axiom-title">Build Something Worth Lasting</div>
+      <p class="axiom-body">
+        I believe I'm on this earth to contribute to something that outlives me. Whether that's a breakthrough in aerospace, a machine that changes how people live, a company that redefines a field — I don't know the exact form yet. But the direction is clear: <em>go further than what came before</em>, and do it with enough craft that it's still worth something long after you're gone.
+      </p>
+      <span class="axiom-tag">Purpose</span>
+    </div>
+  </div>
+
+  <div class="axiom" id="ax8">
+    <div class="axiom-num">AX · 08</div>
+    <div class="axiom-content">
+      <div class="axiom-title">The Most Important Project Is You</div>
+      <p class="axiom-body">
+        I've built dashboards, vents, trading systems, wings. None of them required the effort of building a version of myself I'm proud of. Engineering skills compound. So does confidence, charisma, self-awareness, and emotional intelligence. At 17, I know what I'm capable of technically. <em>Now I'm going deeper — building the person behind the engineer.</em>
+      </p>
+      <span class="axiom-tag">Self</span>
+    </div>
+  </div>
+
+</section>
+
+<!-- Pull quote -->
+<div class="pull-quote-block">
+  <div class="pq-number" aria-hidden="true">AZ</div>
+  <div class="pq-text" id="pqText">
+    "I was born in Tehran, raised in Amsterdam, built in Toronto — and I'm still under construction. <span class="accent">That's the point.</span>"
+    <span class="pq-attr">— Artin Zainalpour, 17</span>
+  </div>
+</div>
+
+<div class="footer-strip">
+  <div class="footer-note">About · Manifesto · <span>8 Axioms</span></div>
+  <a href="journey.html" class="nav-arrow">Journey</a>
+</div>
+
+<script>
+
+
+  function animRing(){
+    rx+=(mx-rx)*0.13;
+    ry+=(my-ry)*0.13;
+    ring.style.left=rx+'px';
+    ring.style.top=ry+'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+  // Hide custom cursor when mouse leaves window
+  document.addEventListener('mouseleave',function(){
+    cursor.style.opacity='0'; ring.style.opacity='0';
+  });
+  document.addEventListener('mouseenter',function(){
+    cursor.style.opacity='1'; ring.style.opacity='1';
+  });
+})();
+
+document.querySelectorAll('a,button').forEach(el=>{el.addEventListener('mouseenter',()=>document.body.classList.add('hovering'));el.addEventListener('mouseleave',()=>document.body.classList.remove('hovering'));});
+
+// Scroll progress
+window.addEventListener('scroll',()=>{
+  const pct=(window.scrollY/(document.body.scrollHeight-window.innerHeight))*100;
+  document.getElementById('progress-bar').style.width=pct+'%';
+});
+
+// Intersection Observer — triggers .visible class
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:0.15});
+
+const animated = [
+  'storyLabel','storyLead','storyCols',
+  'approachTitle','approachSub',
+  'beyondLabel','idolsLabel',
+  'mfEyebrow','mfTitle','mfIntro',
+  'pqText',
+  'ax1','ax2','ax3','ax4','ax5','ax6','ax7','ax8'
+];
+animated.forEach(id=>{const el=document.getElementById(id);if(el)io.observe(el);});
+
+// Principle cards, beyond items, idol cards
+document.querySelectorAll('.principle-card,.beyond-item,.idol-card').forEach(el=>io.observe(el));
+
+// Page transition on link clicks
+document.querySelectorAll('a[href]').forEach(link => {
+  const href = link.getAttribute('href');
+  if (!href || href.startsWith('#') || href.startsWith('mailto') || href.startsWith('http')) return;
+  link.addEventListener('click', e => {
+    e.preventDefault();
+    document.body.classList.add('page-transition-out');
+    setTimeout(() => { window.location.href = href; }, 320);
+  });
+});
+
+
+// ── CURSOR (fixed) ──
+(function(){
+  var cur = document.getElementById('cursor');
+  var ring = document.getElementById('cursor-ring');
+  if (!cur || !ring) return;
+  // Start off-screen
+  var mx = -100, my = -100, rx = -100, ry = -100;
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX;
+    my = e.clientY;
+    // Move crosshair instantly via transform — immune to scroll & page animations
+    cur.style.transform = 'translate(' + (mx - 10) + 'px, ' + (my - 10) + 'px)';
+  }, { passive: true });
+  // Ring follows with lerp
+  function lerpRing() {
+    rx += (mx - rx) * 0.13;
+    ry += (my - ry) * 0.13;
+    ring.style.transform = 'translate(' + (rx - 20) + 'px, ' + (ry - 20) + 'px)';
+    requestAnimationFrame(lerpRing);
+  }
+  lerpRing();
+  document.addEventListener('mouseleave', function() {
+    cur.style.opacity = '0'; ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', function() {
+    cur.style.opacity = '1'; ring.style.opacity = '1';
+  });
+})();
+</script>
+</body>
+</html>
